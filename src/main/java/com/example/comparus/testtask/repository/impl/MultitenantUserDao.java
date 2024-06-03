@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -35,33 +36,26 @@ public class MultitenantUserDao implements UserDao {
         queryBuilder.append(" FROM ");
         queryBuilder.append(tableName);
 
+        List<String> conditions = new ArrayList<>();
+
         if (filter.getId() != null) {
-            queryBuilder.append(" WHERE ").append(condition(filter.getId(), columnMapping.getId()));
-            if (filter.getUsername() != null) {
-                queryBuilder.append(" AND ").append(condition(filter.getUsername(), columnMapping.getUsername()));
-            }
-            if (filter.getName() != null) {
-                queryBuilder.append(" AND ").append(condition(filter.getName(), columnMapping.getName()));
-            }
-            if (filter.getSurname() != null) {
-                queryBuilder.append(" AND ").append(condition(filter.getSurname(), columnMapping.getSurname()));
-            }
-        } else if (filter.getUsername() != null) {
-            queryBuilder.append(" WHERE ").append(condition(filter.getUsername(), columnMapping.getUsername()));
-            if (filter.getName() != null) {
-                queryBuilder.append(" AND ").append(condition(filter.getName(), columnMapping.getName()));
-            }
-            if (filter.getSurname() != null) {
-                queryBuilder.append(" AND ").append(condition(filter.getSurname(), columnMapping.getSurname()));
-            }
-        } else if (filter.getName() != null) {
-            queryBuilder.append(" WHERE ").append(condition(filter.getName(), columnMapping.getName()));
-            if (filter.getSurname() != null) {
-                queryBuilder.append(" AND ").append(condition(filter.getSurname(), columnMapping.getSurname()));
-            }
-        } else if (filter.getSurname() != null) {
-            queryBuilder.append(" WHERE ").append(condition(filter.getSurname(), columnMapping.getSurname()));
+            conditions.add(condition(filter.getId(), columnMapping.getId()));
         }
+        if (filter.getUsername() != null) {
+            conditions.add(condition(filter.getUsername(), columnMapping.getUsername()));
+        }
+        if (filter.getName() != null) {
+            conditions.add(condition(filter.getName(), columnMapping.getName()));
+        }
+        if (filter.getSurname() != null) {
+            conditions.add(condition(filter.getSurname(), columnMapping.getSurname()));
+        }
+
+        if (!conditions.isEmpty()) {
+            queryBuilder.append(" WHERE ")
+                    .append(String.join(" AND ", conditions));
+        }
+
 
         return queryBuilder.toString();
     }

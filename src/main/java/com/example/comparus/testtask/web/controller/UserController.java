@@ -39,13 +39,11 @@ public class UserController {
             description = "Retrieve a list of user data based on the provided search filters",
             tags = {"User"}
     )
-
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "A list of user data",
                     content = {@Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = com.example.comparus.testtask.data.dto.UserData.class)))})
     })
-
     @Parameters(value = {
             @Parameter(in = ParameterIn.QUERY, description = "User ID", name = "id",
                     schema = @Schema(type = "string")),
