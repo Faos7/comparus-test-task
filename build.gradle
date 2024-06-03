@@ -1,0 +1,79 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.0'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id "org.springdoc.openapi-gradle-plugin" version "1.6.0"
+    id "org.openapi.generator" version "6.6.0"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0"
+    implementation "org.mapstruct:mapstruct:1.5.3.Final"
+
+    compileOnly "org.projectlombok:lombok"
+
+    runtimeOnly "org.postgresql:postgresql"
+    implementation 'com.mysql:mysql-connector-j:8.0.33'
+
+
+    annotationProcessor "org.projectlombok:lombok"
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+    }
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //noinspection VulnerableLibrariesLocal
+    testImplementation "com.h2database:h2:2.1.214"
+
+    testAnnotationProcessor "org.projectlombok:lombok"
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+springBoot {
+    buildInfo() // generate build info file
+}
+
+openApiGenerate {
+    generatorName = "spring"
+    inputSpec = "$rootDir/src/main/resources/openapi/openapi.yaml"
+    outputDir = "$buildDir/generated-client"
+    invokerPackage = "{$group}.client"
+    apiPackage = "com.example.comparus.testtask.web.controller"
+    modelPackage = "com.example.comparus.testtask.data.dto"
+    groupId = "$group"
+    library = "spring-cloud"
+    configOptions= [
+            useFeignClientUrl: "true",
+            useSpringBoot3: "true",
+            useResponseEntity : "true",
+            generateBuilders : "true",
+            useSpringController : "true",
+            interfaceOnly : "true",
+            useBeanValidation : "false"
+    ]
+    id = "client"
+    version = "1.0-SNAPSHOT"
+}

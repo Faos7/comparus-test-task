@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpass
+      - POSTGRES_DB=users_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./src/main/resources/db1/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./src/main/resources/db1/fill_tables.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+  second_db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpass
+      - POSTGRES_DB=users_ldap_db
+    ports:
+      - '5433:5432'
+    volumes:
+      - second_db:/var/lib/postgresql/data
+      - ./src/main/resources/db2/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./src/main/resources/db2/fill_tables.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+  mysql_db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      - MYSQL_DATABASE=db
+      - MYSQL_USER=testuser
+      - MYSQL_PASSWORD=testpass
+      - MYSQL_ROOT_PASSWORD=testpass
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_db:/var/lib/mysql
+      - ./src/main/resources/db3/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./src/main/resources/db3/fill_tables.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+volumes:
+  db:
+    driver: local
+  second_db:
+    driver: local
+  mysql_db:
+    driver: local
